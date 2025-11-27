@@ -326,23 +326,26 @@ def main():
             st.subheader("Results")
 
             for i, r in enumerate(results, start=1):
-                # Determine linking URL
+                # Determine linking URL / mention state
                 if r.get("url"):
-                    linking_url = r["url"]
+                    link_display = r["url"]
                 else:
-                    linking_url = url.strip()  # page URL for pure mentions
+                    link_display = "Brand mention (no link)"
             
-                # Determine anchor / mention text
+                # Determine anchor / mention context
                 if r.get("anchor"):
                     anchor_or_mention = r["anchor"]
                 else:
                     anchor_or_mention = r["context"]
-                st.markdown(f"**Link:** {linking_url}")
+            
+                st.markdown(f"### Result {i}")
+                st.markdown(f"**Link:** {link_display}")
                 st.markdown(f"**Score:** `{r['final_score']:.3f}`")
                 st.markdown("**Anchor / Mention context:**")
                 st.markdown(f"> {anchor_or_mention}")
             
                 st.markdown("---")
+
 
 
         except Exception as e:
