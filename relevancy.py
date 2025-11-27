@@ -1,5 +1,5 @@
 import requests
-from bs4 import BeautifulSoup
+from beautifulsoup4 import BeautifulSoup
 from urllib.parse import urljoin
 
 import streamlit as st
