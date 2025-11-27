@@ -75,14 +75,13 @@ def normalize_context(text: str) -> str:
 def chunk_text(text: str, max_words: int = 120, min_words: int = 30) -> list[str]:
     """
     Split text into semantic-ish chunks:
-    - first split into sentences
-    - then group sentences into chunks of up to ~max_words
+    - split into sentences
+    - group sentences into chunks up to ~max_words
     - ensure each chunk has at least min_words (except maybe the last)
     """
     if not text:
         return []
 
-    # Basic sentence split
     sentences = re.split(r'(?<=[.!?])\s+', text)
     sentences = [s.strip() for s in sentences if s.strip()]
 
@@ -94,8 +93,6 @@ def chunk_text(text: str, max_words: int = 120, min_words: int = 30) -> list[str
         if not words:
             continue
 
-        # If adding this sentence would make the chunk too big,
-        # and we already have a reasonable chunk, start a new one.
         if (
             len(current_words) + len(words) > max_words
             and len(current_words) >= min_words
@@ -106,7 +103,6 @@ def chunk_text(text: str, max_words: int = 120, min_words: int = 30) -> list[str
             current_words.extend(words)
 
     if current_words:
-        # Add final chunk, even if short, as long as we have nothing else
         if len(current_words) >= min_words or not chunks:
             chunks.append(" ".join(current_words))
 
@@ -146,7 +142,7 @@ def analyse_mentions_and_links_semantic(
     Score each using SEMANTIC similarity:
 
       local_similarity   = sim(client_desc, local_context)
-      article_similarity = mean(top 3 chunk similarities between client_desc and article chunks)
+      article_similarity = max(chunk similarities between client_desc and article chunks)
 
       final_score = 0.5 * local_similarity + 0.5 * article_similarity
     """
@@ -173,7 +169,6 @@ def analyse_mentions_and_links_semantic(
                 continue
 
             if url_l in seen_urls:
-                # already have an entry for this URL
                 continue
             seen_urls.add(url_l)
 
@@ -217,7 +212,7 @@ def analyse_mentions_and_links_semantic(
     if not entries:
         return []
 
-    # 3) DE-DUPE BY CONTEXT (so same sentence/paragraph appears once)
+    # 3) DE-DUPE BY CONTEXT
     seen_contexts = set()
     unique_entries = []
     for e in entries:
@@ -239,17 +234,13 @@ def analyse_mentions_and_links_semantic(
 
     # 5) SEMANTIC SCORING
     model = SentenceTransformer("all-MiniLM-L6-v2")
-
     emb_client = model.encode(client_description, normalize_embeddings=True)
 
-    # Article chunks → article similarity (mean of top 3 chunks)
+    # Article chunks → article similarity = MAX chunk similarity
     emb_chunks = model.encode(chunks, normalize_embeddings=True)
     chunk_sims = util.cos_sim(emb_client, emb_chunks)[0].tolist()
 
-    chunk_sims_sorted = sorted(chunk_sims, reverse=True)
-    k = min(3, len(chunk_sims_sorted))
-    top_k = chunk_sims_sorted[:k]
-    article_sim = float(sum(top_k) / k) if k > 0 else 0.0
+    article_sim = float(max(chunk_sims)) if chunk_sims else 0.0
 
     # Local contexts
     local_texts = [e["context"] for e in entries]
@@ -276,13 +267,13 @@ def analyse_mentions_and_links_semantic(
 # -----------------------
 
 def main():
-    st.title("Client Mention & Relevancy Checker (Chunked)")
+    st.title("Client Mention & Relevancy Checker (Chunked, Max-Chunk)")
 
     st.markdown(
         "Analyses how contextually relevant a page is to a client, "
         "based on brand mentions and links to their domain.\n\n"
-        "- Uses **chunked article similarity** (mean of top 3 chunks)\n"
-        "- Final score = 0.5 × local similarity + 0.5 × article similarity"
+        "- Article relevance is computed from **chunks of the article**, using the **best-matching chunk**.\n"
+        "- Final score = 0.5 × local similarity + 0.5 × article similarity."
     )
 
     with st.form("input_form"):
@@ -350,7 +341,7 @@ def main():
                 st.markdown(f"**Score:** `{r['final_score']:.3f}`")
                 st.markdown(
                     f"*Local similarity:* `{r['local_similarity']:.3f}`  |  "
-                    f"*Article similarity (chunked):* `{r['article_similarity']:.3f}`"
+                    f"*Article similarity (best chunk):* `{r['article_similarity']:.3f}`"
                 )
                 st.markdown("**Anchor / Mention context:**")
                 st.markdown(f"> {anchor_or_mention}")
