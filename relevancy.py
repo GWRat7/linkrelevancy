@@ -219,9 +219,9 @@ def main():
 
     # Initialise session_state defaults
     if "weight_local" not in st.session_state:
-        st.session_state["weight_local"] = 0.6
+        st.session_state["weight_local"] = 0.5
     if "weight_article" not in st.session_state:
-        st.session_state["weight_article"] = 0.4
+        st.session_state["weight_article"] = 0.5
 
     # Callback to keep weights summing to 1
     def update_weights_from_local():
@@ -232,7 +232,7 @@ def main():
 
     # User controls ONLY this slider
     st.slider(
-        "Local context weight",
+        "Immediate anchor text context weight",
         min_value=0.0,
         max_value=1.0,
         step=0.05,
