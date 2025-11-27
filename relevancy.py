@@ -209,23 +209,32 @@ def main():
             height=150,
         )
 
-        col1, col2 = st.columns(2)
-        with col1:
-            weight_local = st.slider(
-                "Weight: local context",
-                min_value=0.0,
-                max_value=1.0,
-                value=0.6,
-                step=0.05,
-            )
-        with col2:
-            weight_article = st.slider(
-                "Weight: article-level context",
-                min_value=0.0,
-                max_value=1.0,
-                value=0.4,
-                step=0.05,
-            )
+        st.markdown("### Scoring balance")
+
+        weight_local = st.slider(
+            "Local context weight",
+            min_value=0.0,
+            max_value=1.0,
+            value=0.6,
+            step=0.05,
+        )
+        
+        # Automatically derived so total = 1.0
+        weight_article = round(1.0 - weight_local, 2)
+        
+        st.slider(
+            "Article-level context weight (auto)",
+            min_value=0.0,
+            max_value=1.0,
+            value=weight_article,
+            step=0.05,
+            disabled=True,
+        )
+        
+        st.caption(
+            f"Final score = {weight_local:.2f} × local similarity "
+            f"+ {weight_article:.2f} × article similarity"
+        )
 
         submitted = st.form_submit_button("Analyse")
 
