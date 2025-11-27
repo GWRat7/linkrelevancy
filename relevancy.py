@@ -208,7 +208,6 @@ def main():
     st.markdown(
         "Analyse how contextually relevant a page is to a client, "
         "based on brand mentions and links to their domain.\n\n"
-        "Final score = 0.5 × local similarity + 0.5 × article similarity."
     )
 
     with st.form("input_form"):
