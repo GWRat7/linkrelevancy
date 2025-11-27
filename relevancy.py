@@ -207,7 +207,7 @@ def main():
 
     st.markdown(
         "Analyse how contextually relevant a page is to a client, "
-        "based on brand mentions and links to their domain.\n\n"
+        "based on your description.\n\n"
     )
 
     with st.form("input_form"):
