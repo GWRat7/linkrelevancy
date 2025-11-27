@@ -323,28 +323,29 @@ def main():
                     return ctx
                 return ctx[:max_len] + "..."
 
-            df_out = pd.DataFrame(
-                {
-                    "linking_url": df.apply(get_linking_url, axis=1),
-                    "brand_mention_or_anchor": df.apply(get_text, axis=1),
-                    "score": df["final_score"],
-                }
-            )
-
             st.subheader("Results")
-            st.write(
-                "Each row shows the linking URL, the brand mention or anchor text, "
-                "and the overall relevance score."
-            )
 
-            st.dataframe(
-                df_out.style.format(
-                    {
-                        "score": "{:.3f}",
-                    }
-                ),
-                use_container_width=True,
-            )
+            for i, r in enumerate(results, start=1):
+                # Determine linking URL
+                if r.get("url"):
+                    linking_url = r["url"]
+                else:
+                    linking_url = url.strip()  # page URL for pure mentions
+            
+                # Determine anchor / mention text
+                if r.get("anchor"):
+                    anchor_or_mention = r["anchor"]
+                else:
+                    anchor_or_mention = r["context"]
+            
+                st.markdown(f"### Result {i}")
+                st.markdown(f"**Link:** {linking_url}")
+                st.markdown(f"**Score:** `{r['final_score']:.3f}`")
+                st.markdown("**Anchor / Mention context:**")
+                st.markdown(f"> {anchor_or_mention}")
+            
+                st.markdown("---")
+
 
         except Exception as e:
             st.error(f"Something went wrong: {e}")
