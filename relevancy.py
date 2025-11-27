@@ -337,8 +337,6 @@ def main():
                     anchor_or_mention = r["anchor"]
                 else:
                     anchor_or_mention = r["context"]
-            
-                st.markdown(f"### Result {i}")
                 st.markdown(f"**Link:** {link_display}")
                 st.markdown(f"**Score:** `{r['final_score']:.3f}`")
                 st.markdown("**Anchor / Mention context:**")
