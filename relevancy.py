@@ -204,9 +204,7 @@ def main():
         client_domain = st.text_input("Client domain (e.g. example.com)", value="")
         client_description = st.text_area(
             "Client description (what they do / offer)",
-            value=(
-                "We are a UK travel brand specialising in short breaks, "
-                "weekend getaways and holidays in Cotswolds and other UK destinations."
+            value=(""
             ),
             height=150,
         )
