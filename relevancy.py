@@ -197,6 +197,25 @@ def analyse_mentions_and_links_semantic(
     entries.sort(key=lambda x: x["final_score"], reverse=True)
     return entries
 
+import re
+
+def extract_sentence_with_anchor(context: str, anchor: str) -> str:
+    """
+    From a block of text, return the sentence that contains the anchor text.
+    Falls back to full context if sentence cannot be isolated.
+    """
+    if not anchor or not context:
+        return context
+
+    # Split into sentences (simple but effective)
+    sentences = re.split(r'(?<=[.!?])\s+', context)
+
+    anchor_l = anchor.lower()
+    for sentence in sentences:
+        if anchor_l in sentence.lower():
+            return sentence.strip()
+
+    return context
 
 # -----------------------
 # Streamlit UI
@@ -261,10 +280,15 @@ def main():
                     link_display = "Brand mention (no link)"
 
                 # Anchor text or full context
+                # Anchor sentence (for links) or paragraph (for mentions)
                 if r.get("anchor"):
-                    anchor_or_mention = r["anchor"]
+                    anchor_or_mention = extract_sentence_with_anchor(
+                        context=r["context"],
+                        anchor=r["anchor"],
+                    )
                 else:
                     anchor_or_mention = r["context"]
+
                 st.markdown(f"**Link:** {link_display}")
                 st.markdown(f"**Score:** `{r['final_score']:.3f}`")
                 st.markdown("**Anchor / Mention context:**")
