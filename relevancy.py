@@ -198,7 +198,7 @@ def main():
     with st.form("input_form"):
         url = st.text_input(
             "Page URL",
-            value="https://www.cotswoldjournal.co.uk/news/25644080.inside-charlbury-cotswolds---history-food-spots/",
+            value="",
         )
         client_name = st.text_input("Client name (as mentioned in text)", value="")
         client_domain = st.text_input("Client domain (e.g. example.com)", value="")
