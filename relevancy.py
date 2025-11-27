@@ -214,15 +214,14 @@ def main():
     with st.form("input_form"):
         url = st.text_input(
             "Page URL",
-            value="https://www.cotswoldjournal.co.uk/news/25644080.inside-charlbury-cotswolds---history-food-spots/",
+            value="",
         )
         client_name = st.text_input("Client name (as mentioned in text)", value="")
         client_domain = st.text_input("Client domain (e.g. example.com)", value="")
         client_description = st.text_area(
             "Client description (what they do / offer)",
             value=(
-                "We are a UK travel brand specialising in short breaks, "
-                "weekend getaways and holidays in Cotswolds and other UK destinations."
+                ""
             ),
             height=150,
         )
@@ -267,8 +266,6 @@ def main():
                     anchor_or_mention = r["anchor"]
                 else:
                     anchor_or_mention = r["context"]
-
-                st.markdown(f"### Result {i}")
                 st.markdown(f"**Link:** {link_display}")
                 st.markdown(f"**Score:** `{r['final_score']:.3f}`")
                 st.markdown("**Anchor / Mention context:**")
